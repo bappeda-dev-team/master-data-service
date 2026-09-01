@@ -24,6 +24,38 @@ func NewMasterSyncService(
 	}
 }
 
+func (s *MasterSyncService) Create(
+	ctx context.Context,
+	sync domain.DataMasterSync,
+) error {
+	if err := s.Repo.Create(ctx, sync); err != nil {
+		s.Logger.Error(
+			"create sync record",
+			"id", sync.ID,
+			"sync_type", sync.SyncType,
+			"err", err,
+		)
+		return err
+	}
+	return nil
+}
+
+func (s *MasterSyncService) Finish(
+	ctx context.Context,
+	sync domain.DataMasterSync,
+) error {
+	if err := s.Repo.Finish(ctx, sync); err != nil {
+		s.Logger.Error(
+			"finish sync record",
+			"id", sync.ID,
+			"sync_type", sync.SyncType,
+			"err", err,
+		)
+		return err
+	}
+	return nil
+}
+
 func (s *MasterSyncService) GetActiveSnapshot(
 	ctx context.Context,
 	snap domain.DataMasterSync,

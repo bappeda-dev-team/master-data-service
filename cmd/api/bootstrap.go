@@ -9,6 +9,7 @@ import (
 	masterSyncRepository "master-data-service/internal/master_sync/repository"
 	masterSyncService "master-data-service/internal/master_sync/service"
 
+	opdClient "master-data-service/internal/opd/client"
 	opdRepository "master-data-service/internal/opd/repository"
 	opdService "master-data-service/internal/opd/service"
 )
@@ -37,9 +38,18 @@ func buildApplication(
 		logger,
 	)
 
+	simpegClient := opdClient.NewSimpegClient(
+		opdClient.SimpegConfig{
+			BaseURL: cfg.Simpeg.BaseURL,
+			ApiPath: cfg.Simpeg.ApiPath,
+		},
+		logger,
+	)
+
 	opdSvc := opdService.NewDataMasterOpdService(
 		dataMasterOpdRepo,
 		masterSyncSvc,
+		simpegClient,
 		logger,
 	)
 

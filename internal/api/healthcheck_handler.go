@@ -16,6 +16,9 @@ import (
 // @Router /healthcheck [get]
 func (app *Application) HealthcheckHandler(w http.ResponseWriter, r *http.Request) {
 	data := web.Response[web.HealthcheckResponse]{
+		Code:    http.StatusOK,
+		Status:  http.StatusText(http.StatusOK),
+		Message: "master-data-service up",
 		Data: web.HealthcheckResponse{
 			Status: "up",
 			SystemInfo: web.HealthcheckSystemInfo{

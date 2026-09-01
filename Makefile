@@ -1,6 +1,6 @@
 APP_NAME=master-data-service
 
-.PHONY: build run clean test swagger build-image build-docker format dev
+.PHONY: build run clean test swagger build-image build-docker format dev check-format
 
 build:
 	@mkdir -p bin
@@ -13,6 +13,10 @@ build-docker:
 
 format:
 	goimports -w .
+
+check-format:
+	@test -z "$$(gofmt -l .)" || (echo "gofmt required:" && gofmt -l . && exit 1)
+	@test -z "$$(goimports -l .)" || (echo "goimports required:" && goimports -l . && exit 1)
 
 run:
 	go run ./cmd/api

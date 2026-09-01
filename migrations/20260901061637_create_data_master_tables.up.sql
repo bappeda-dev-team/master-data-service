@@ -1,5 +1,5 @@
 CREATE TABLE data_master_sync (
-    id CHAR(36) NOT NULL,
+    id UUID PRIMARY KEY,
 
     sync_from VARCHAR(255) NOT NULL,
     sync_type VARCHAR(50) NOT NULL,
@@ -9,39 +9,35 @@ CREATE TABLE data_master_sync (
 
     status VARCHAR(20) NOT NULL,
 
-    total_data INT NOT NULL DEFAULT 0,
-    total_success INT NOT NULL DEFAULT 0,
-    total_failed INT NOT NULL DEFAULT 0,
+    total_data INTEGER NOT NULL DEFAULT 0,
+    total_success INTEGER NOT NULL DEFAULT 0,
+    total_failed INTEGER NOT NULL DEFAULT 0
+);
 
-    PRIMARY KEY (id),
-
-    INDEX idx_data_master_sync_source (
+CREATE INDEX idx_data_master_sync_source
+    ON data_master_sync (
         sync_from,
         sync_type,
         started_at
-    )
-);
+    );
 
 
 CREATE TABLE data_master_opd (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
     opd_kode VARCHAR(50) NOT NULL,
     opd_level SMALLINT NOT NULL,
     opd_nama VARCHAR(255) NOT NULL,
-    opd_jabatan VARCHAR(255) NULL,
-    eselon_kode VARCHAR(20) NULL,
-    eselon_nama VARCHAR(50) NULL,
+    opd_jabatan VARCHAR(255),
+    eselon_kode VARCHAR(20),
+    eselon_nama VARCHAR(50),
 
-    sync_id CHAR(36) NULL,
-    sync_from VARCHAR(255) NULL,
-    sync_at TIMESTAMP NULL,
+    sync_id UUID,
+    sync_from VARCHAR(255),
+    sync_at TIMESTAMP,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (id),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT uk_data_master_opd_kode
         UNIQUE (opd_kode),
@@ -55,39 +51,36 @@ CREATE TABLE data_master_opd (
 
 
 CREATE TABLE data_master_jabatan (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
-    opd_kode VARCHAR(50) NOT NULL,
+    opd_id BIGINT NOT NULL,
 
     jenis_jabatan_kode VARCHAR(20) NOT NULL,
-    jenis_jabatan_nama VARCHAR(100) NULL,
+    jenis_jabatan_nama VARCHAR(100),
 
     jabatan_kode VARCHAR(50) NOT NULL,
     jabatan_nama VARCHAR(255) NOT NULL,
 
-    jenjang_jabatan_kode VARCHAR(20) NULL,
-    jenjang_jabatan_nama VARCHAR(100) NULL,
+    jenjang_jabatan_kode VARCHAR(20),
+    jenjang_jabatan_nama VARCHAR(100),
 
-    sync_id CHAR(36) NULL,
-    sync_from VARCHAR(255) NULL,
-    sync_at TIMESTAMP NULL,
+    sync_id UUID,
+    sync_from VARCHAR(255),
+    sync_at TIMESTAMP,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (id),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT uk_data_master_jabatan
         UNIQUE (
-            opd_kode,
+            opd_id,
             jenis_jabatan_kode,
             jabatan_kode
         ),
 
     CONSTRAINT fk_data_master_jabatan_opd
-        FOREIGN KEY (opd_kode)
-        REFERENCES data_master_opd (opd_kode)
+        FOREIGN KEY (opd_id)
+        REFERENCES data_master_opd (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
 
@@ -95,65 +88,63 @@ CREATE TABLE data_master_jabatan (
         FOREIGN KEY (sync_id)
         REFERENCES data_master_sync (id)
         ON UPDATE CASCADE
-        ON DELETE SET NULL,
-
-    INDEX idx_data_master_jabatan_opd (opd_kode)
+        ON DELETE SET NULL
 );
+
+CREATE INDEX idx_data_master_jabatan_opd
+    ON data_master_jabatan (opd_id);
 
 
 CREATE TABLE data_master_pegawai (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
     pegawai_nip VARCHAR(30) NOT NULL,
 
     pegawai_nama VARCHAR(255) NOT NULL,
 
-    pegawai_jenis_kelamin VARCHAR(30) NULL,
+    pegawai_jenis_kelamin VARCHAR(30),
 
-    pegawai_lahir_tempat VARCHAR(100) NULL,
-    pegawai_lahir_tanggal DATE NULL,
+    pegawai_lahir_tempat VARCHAR(100),
+    pegawai_lahir_tanggal DATE,
 
-    pegawai_pensiun_tmt DATE NULL,
+    pegawai_pensiun_tmt DATE,
 
-    pegawai_aktif_id VARCHAR(20) NULL,
-    pegawai_status VARCHAR(100) NULL,
-    pegawai_jenis VARCHAR(255) NULL,
+    pegawai_aktif_id VARCHAR(20),
+    pegawai_status VARCHAR(100),
+    pegawai_jenis VARCHAR(255),
 
-    pegawai_golongan_kode VARCHAR(20) NULL,
-    pegawai_golongan_nama VARCHAR(50) NULL,
-    pegawai_golongan_pangkat VARCHAR(100) NULL,
-    pegawai_golongan_tmt DATE NULL,
+    pegawai_golongan_kode VARCHAR(20),
+    pegawai_golongan_nama VARCHAR(50),
+    pegawai_golongan_pangkat VARCHAR(100),
+    pegawai_golongan_tmt DATE,
 
-    pegawai_jenis_jabatan_kode VARCHAR(20) NULL,
-    pegawai_jenis_jabatan_nama VARCHAR(100) NULL,
+    pegawai_jenis_jabatan_kode VARCHAR(20),
+    pegawai_jenis_jabatan_nama VARCHAR(100),
 
-    pegawai_jabatan_kode VARCHAR(50) NULL,
-    pegawai_jabatan_terakhir VARCHAR(255) NULL,
+    pegawai_jabatan_kode VARCHAR(50),
+    pegawai_jabatan_terakhir VARCHAR(255),
 
-    pegawai_eselon_kode VARCHAR(20) NULL,
-    pegawai_eselon_nama VARCHAR(50) NULL,
+    pegawai_eselon_kode VARCHAR(20),
+    pegawai_eselon_nama VARCHAR(50),
 
-    opd_kode VARCHAR(50) NOT NULL,
+    opd_id BIGINT NOT NULL,
 
-    opd_level SMALLINT NULL,
-    opd_nama VARCHAR(255) NULL,
+    opd_level SMALLINT,
+    opd_nama VARCHAR(255),
 
-    sync_id CHAR(36) NULL,
-    sync_from VARCHAR(255) NULL,
-    sync_at TIMESTAMP NULL,
+    sync_id UUID,
+    sync_from VARCHAR(255),
+    sync_at TIMESTAMP,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (id),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT uk_data_master_pegawai_nip
         UNIQUE (pegawai_nip),
 
     CONSTRAINT fk_data_master_pegawai_opd
-        FOREIGN KEY (opd_kode)
-        REFERENCES data_master_opd (opd_kode)
+        FOREIGN KEY (opd_id)
+        REFERENCES data_master_opd (id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
 
@@ -161,13 +152,15 @@ CREATE TABLE data_master_pegawai (
         FOREIGN KEY (sync_id)
         REFERENCES data_master_sync (id)
         ON UPDATE CASCADE
-        ON DELETE SET NULL,
+        ON DELETE SET NULL
+);
 
-    INDEX idx_data_master_pegawai_opd (opd_kode),
+CREATE INDEX idx_data_master_pegawai_opd
+    ON data_master_pegawai (opd_id);
 
-    INDEX idx_data_master_pegawai_jabatan (
-        opd_kode,
+CREATE INDEX idx_data_master_pegawai_jabatan
+    ON data_master_pegawai (
+        opd_id,
         pegawai_jenis_jabatan_kode,
         pegawai_jabatan_kode
-    )
-);
+    );

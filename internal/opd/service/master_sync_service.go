@@ -10,4 +10,14 @@ type SnapshotService interface {
 		ctx context.Context,
 		sync domain.DataMasterSync,
 	) (string, error)
+
+	Create(
+		ctx context.Context,
+		sync domain.DataMasterSync,
+	) error
+
+	Finish(
+		ctx context.Context,
+		sync domain.DataMasterSync,
+	) error
 }

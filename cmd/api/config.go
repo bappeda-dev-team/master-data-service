@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"master-data-service/internal/api"
+
 	"github.com/joho/godotenv"
 )
 
@@ -32,6 +33,16 @@ func loadConfig(logger *slog.Logger) api.Config {
 	cfg.DB.Dsn = getRequiredEnv(
 		logger,
 		"DB_DSN",
+	)
+
+	cfg.Simpeg.BaseURL = getEnv(
+		"SIMPEG_BASE_URL",
+		"",
+	)
+
+	cfg.Simpeg.ApiPath = getEnv(
+		"SIMPEG_API_PATH",
+		"",
 	)
 
 	return cfg

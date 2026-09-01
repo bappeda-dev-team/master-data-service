@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log/slog"
+	"time"
 
 	"master-data-service/internal/opd/domain"
 )
@@ -21,6 +22,116 @@ func NewMasterDataOpdRepository(
 		DB:     db,
 		Logger: logger,
 	}
+}
+
+func (repo *MasterDataOpdRepository) BulkInsert(
+	ctx context.Context,
+	opds []domain.DataMasterOpd,
+	syncID string,
+	syncFrom string,
+) (int, error) {
+	const op = "opd-repo-BulkInsert"
+
+	repo.Logger.Debug(
+		"bulk insert opd",
+		"op", op,
+		"sync_id", syncID,
+		"sync_from", syncFrom,
+		"count", len(opds),
+	)
+
+	const query = `
+		INSERT INTO data_master_opd (
+			opd_kode,
+			opd_level,
+			opd_nama,
+			opd_jabatan,
+			eselon_kode,
+			eselon_nama,
+			sync_id,
+			sync_from,
+			sync_at
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		ON CONFLICT (opd_kode) DO UPDATE SET
+			opd_level = EXCLUDED.opd_level,
+			opd_nama = EXCLUDED.opd_nama,
+			opd_jabatan = EXCLUDED.opd_jabatan,
+			eselon_kode = EXCLUDED.eselon_kode,
+			eselon_nama = EXCLUDED.eselon_nama,
+			sync_id = EXCLUDED.sync_id,
+			sync_from = EXCLUDED.sync_from,
+			sync_at = EXCLUDED.sync_at,
+			updated_at = CURRENT_TIMESTAMP
+	`
+
+	now := time.Now()
+
+	tx, err := repo.DB.BeginTx(ctx, nil)
+	if err != nil {
+		repo.Logger.Error(
+			"failed to begin transaction",
+			"op", op,
+			"error", err,
+		)
+		return 0, err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.PrepareContext(ctx, query)
+	if err != nil {
+		repo.Logger.Error(
+			"failed to prepare insert statement",
+			"op", op,
+			"error", err,
+		)
+		return 0, err
+	}
+	defer stmt.Close()
+
+	inserted := 0
+	for _, opd := range opds {
+		_, err := stmt.ExecContext(
+			ctx,
+			opd.OpdKode,
+			opd.OpdLevel,
+			opd.OpdNama,
+			opd.OpdJabatan,
+			opd.EselonKode,
+			opd.EselonNama,
+			syncID,
+			syncFrom,
+			now,
+		)
+		if err != nil {
+			repo.Logger.Error(
+				"failed to insert opd",
+				"op", op,
+				"opd_kode", opd.OpdKode,
+				"error", err,
+			)
+			return inserted, err
+		}
+		inserted++
+	}
+
+	if err := tx.Commit(); err != nil {
+		repo.Logger.Error(
+			"failed to commit transaction",
+			"op", op,
+			"error", err,
+		)
+		return inserted, err
+	}
+
+	repo.Logger.Debug(
+		"successfully bulk inserted opd",
+		"op", op,
+		"sync_id", syncID,
+		"inserted", inserted,
+	)
+
+	return inserted, nil
 }
 
 func (repo *MasterDataOpdRepository) FindAllOpdBySnapshotId(
@@ -50,7 +161,7 @@ func (repo *MasterDataOpdRepository) FindAllOpdBySnapshotId(
 			created_at,
 			updated_at
 		FROM data_master_opd
-		WHERE sync_id = ?
+		WHERE sync_id = $1
 		ORDER BY opd_kode
 	`
 
