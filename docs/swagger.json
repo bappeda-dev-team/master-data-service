@@ -1,0 +1,138 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Source Data Master. Not updateable, sync and view only",
+        "title": "Master Data Service",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Kertaskerja Dev Team"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/healthcheck": {
+            "get": {
+                "description": "Get all opd",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "opd"
+                ],
+                "summary": "Get all Opd",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-array_web_DataMasterOpdResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "web.DataMasterOpdResponse": {
+            "type": "object",
+            "properties": {
+                "eselon_kode": {
+                    "type": "string"
+                },
+                "eselon_nama": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "opd_jabatan": {
+                    "type": "string"
+                },
+                "opd_kode": {
+                    "type": "string"
+                },
+                "opd_level": {
+                    "type": "integer"
+                },
+                "opd_nama": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {}
+            }
+        },
+        "web.HealthcheckResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "system_info": {
+                    "$ref": "#/definitions/web.HealthcheckSystemInfo"
+                }
+            }
+        },
+        "web.HealthcheckSystemInfo": {
+            "type": "object",
+            "properties": {
+                "environment": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.Response-array_web_DataMasterOpdResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.DataMasterOpdResponse"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.Response-web_HealthcheckResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/web.HealthcheckResponse"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,32 @@
+APP_NAME=master-data-service
+
+.PHONY: build run clean test swagger build-image build-docker format dev
+
+build:
+	@mkdir -p bin
+	go build -o ./bin/$(APP_NAME) ./cmd/api
+
+build-docker:
+	@mkdir -p bin
+	CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" \
+	-o ./bin/app ./cmd/api
+
+format:
+	goimports -w .
+
+run:
+	go run ./cmd/api
+
+dev: format run
+
+test:
+	go test -race ./...
+
+swagger:
+	swag init -d cmd/api,internal/api,internal/model,internal/web,internal/opd/domain,internal/opd/web,internal/master_sync/domain,internal/master_sync/web
+
+clean:
+	rm -f ./bin/$(APP_NAME)
+
+build-image:
+	@docker build . -t $(APP_NAME)

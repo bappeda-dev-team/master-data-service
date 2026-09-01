@@ -1,0 +1,90 @@
+basePath: /
+definitions:
+  web.DataMasterOpdResponse:
+    properties:
+      eselon_kode:
+        type: string
+      eselon_nama:
+        type: string
+      id:
+        type: integer
+      opd_jabatan:
+        type: string
+      opd_kode:
+        type: string
+      opd_level:
+        type: integer
+      opd_nama:
+        type: string
+    type: object
+  web.ErrorResponse:
+    properties:
+      error: {}
+    type: object
+  web.HealthcheckResponse:
+    properties:
+      status:
+        type: string
+      system_info:
+        $ref: '#/definitions/web.HealthcheckSystemInfo'
+    type: object
+  web.HealthcheckSystemInfo:
+    properties:
+      environment:
+        type: string
+      version:
+        type: string
+    type: object
+  web.Response-array_web_DataMasterOpdResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/web.DataMasterOpdResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  web.Response-web_HealthcheckResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/web.HealthcheckResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+info:
+  contact:
+    name: Kertaskerja Dev Team
+  description: Source Data Master. Not updateable, sync and view only
+  termsOfService: http://swagger.io/terms/
+  title: Master Data Service
+  version: "1.0"
+paths:
+  /healthcheck:
+    get:
+      description: Get all opd
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response-array_web_DataMasterOpdResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get all Opd
+      tags:
+      - opd
+schemes:
+- http
+- https
+swagger: "2.0"
