@@ -142,28 +142,52 @@ func (repo *MasterSyncRepository) FindActiveSnapshot(
 	const op = "master-sync-repo-FindActiveSnapshot"
 
 	repo.Logger.Debug(
-		"find active snapshot",
+		"find latest active snapshot",
 		"op", op,
 		"sync_type", req.SyncType,
 		"sync_from", req.SyncFrom,
-		"status", req.Status,
 	)
-	query := `SELECT id
+
+	const query = `
+		SELECT id
 		FROM data_master_sync
 		WHERE sync_type = $1
-		AND sync_from = $2
-		AND status = $3`
+		  AND sync_from = $2
+		  AND status = 'SUCCESS'
+		  AND finished_at IS NOT NULL
+		ORDER BY finished_at DESC
+		LIMIT 1
+	`
+
 	var id string
+
 	err := repo.DB.QueryRowContext(
 		ctx,
 		query,
 		req.SyncType,
 		req.SyncFrom,
-		req.Status,
 	).Scan(&id)
+
 	if err != nil {
+		repo.Logger.Error(
+			"failed to find latest active snapshot",
+			"op", op,
+			"sync_type", req.SyncType,
+			"sync_from", req.SyncFrom,
+			"status", req.Status,
+			"error", err,
+		)
+
 		return "", err
 	}
+
+	repo.Logger.Debug(
+		"latest active snapshot found",
+		"op", op,
+		"snapshot_id", id,
+		"sync_type", req.SyncType,
+		"sync_from", req.SyncFrom,
+	)
 
 	return id, nil
 }

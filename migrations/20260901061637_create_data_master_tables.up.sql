@@ -39,8 +39,8 @@ CREATE TABLE data_master_opd (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT uk_data_master_opd_kode
-        UNIQUE (opd_kode),
+    CONSTRAINT uk_data_master_opd
+        UNIQUE (sync_id, opd_kode),
 
     CONSTRAINT fk_data_master_opd_sync
         FOREIGN KEY (sync_id)
@@ -49,11 +49,17 @@ CREATE TABLE data_master_opd (
         ON DELETE SET NULL
 );
 
+CREATE INDEX idx_data_master_opd_kode
+    ON data_master_opd (opd_kode);
+
+CREATE INDEX idx_data_master_opd_sync_kode
+    ON data_master_opd (sync_id, opd_kode);
+
 
 CREATE TABLE data_master_jabatan (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
-    opd_id BIGINT NOT NULL,
+    opd_kode VARCHAR(50) NOT NULL,
 
     jenis_jabatan_kode VARCHAR(20) NOT NULL,
     jenis_jabatan_nama VARCHAR(100),
@@ -73,16 +79,11 @@ CREATE TABLE data_master_jabatan (
 
     CONSTRAINT uk_data_master_jabatan
         UNIQUE (
-            opd_id,
+            sync_id,
+            opd_kode,
             jenis_jabatan_kode,
             jabatan_kode
         ),
-
-    CONSTRAINT fk_data_master_jabatan_opd
-        FOREIGN KEY (opd_id)
-        REFERENCES data_master_opd (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
 
     CONSTRAINT fk_data_master_jabatan_sync
         FOREIGN KEY (sync_id)
@@ -92,11 +93,16 @@ CREATE TABLE data_master_jabatan (
 );
 
 CREATE INDEX idx_data_master_jabatan_opd
-    ON data_master_jabatan (opd_id);
+    ON data_master_jabatan (opd_kode);
+
+CREATE INDEX idx_data_master_jabatan_sync_opd
+    ON data_master_jabatan (sync_id, opd_kode);
 
 
 CREATE TABLE data_master_pegawai (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+    opd_kode VARCHAR(50) NOT NULL,
 
     pegawai_nip VARCHAR(30) NOT NULL,
 
@@ -127,8 +133,6 @@ CREATE TABLE data_master_pegawai (
     pegawai_eselon_kode VARCHAR(20),
     pegawai_eselon_nama VARCHAR(50),
 
-    opd_id BIGINT NOT NULL,
-
     opd_level SMALLINT,
     opd_nama VARCHAR(255),
 
@@ -139,14 +143,8 @@ CREATE TABLE data_master_pegawai (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT uk_data_master_pegawai_nip
-        UNIQUE (pegawai_nip),
-
-    CONSTRAINT fk_data_master_pegawai_opd
-        FOREIGN KEY (opd_id)
-        REFERENCES data_master_opd (id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
+    CONSTRAINT uk_data_master_pegawai
+        UNIQUE (sync_id, pegawai_nip),
 
     CONSTRAINT fk_data_master_pegawai_sync
         FOREIGN KEY (sync_id)
@@ -156,11 +154,15 @@ CREATE TABLE data_master_pegawai (
 );
 
 CREATE INDEX idx_data_master_pegawai_opd
-    ON data_master_pegawai (opd_id);
+    ON data_master_pegawai (opd_kode);
+
+CREATE INDEX idx_data_master_pegawai_sync_opd
+    ON data_master_pegawai (sync_id, opd_kode);
 
 CREATE INDEX idx_data_master_pegawai_jabatan
     ON data_master_pegawai (
-        opd_id,
+        sync_id,
+        opd_kode,
         pegawai_jenis_jabatan_kode,
         pegawai_jabatan_kode
     );

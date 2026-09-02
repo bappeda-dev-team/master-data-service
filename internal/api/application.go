@@ -2,6 +2,7 @@ package api
 
 import (
 	"log/slog"
+	jabatan "master-data-service/internal/jabatan/service"
 	masterSync "master-data-service/internal/master_sync/service"
 	opd "master-data-service/internal/opd/service"
 )
@@ -36,4 +37,6 @@ type Application struct {
 	MasterSync *masterSync.MasterSyncService
 
 	Opd *opd.DataMasterOpdService
+
+	Jabatan *jabatan.MasterDataJabatanService
 }

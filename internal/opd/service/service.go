@@ -87,6 +87,7 @@ func (s *DataMasterOpdService) SyncDataOpd(
 			OpdJabatan: so.OpdJabatan,
 			EselonKode: so.EselonKode,
 			EselonNama: so.EselonNama,
+			SyncID:     &syncID,
 		})
 	}
 

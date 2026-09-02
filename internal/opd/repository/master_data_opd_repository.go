@@ -52,17 +52,10 @@ func (repo *MasterDataOpdRepository) BulkInsert(
 			sync_from,
 			sync_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		ON CONFLICT (opd_kode) DO UPDATE SET
-			opd_level = EXCLUDED.opd_level,
-			opd_nama = EXCLUDED.opd_nama,
-			opd_jabatan = EXCLUDED.opd_jabatan,
-			eselon_kode = EXCLUDED.eselon_kode,
-			eselon_nama = EXCLUDED.eselon_nama,
-			sync_id = EXCLUDED.sync_id,
-			sync_from = EXCLUDED.sync_from,
-			sync_at = EXCLUDED.sync_at,
-			updated_at = CURRENT_TIMESTAMP
+		VALUES (
+			$1, $2, $3, $4, $5,
+			$6, $7, $8, $9
+		)
 	`
 
 	now := time.Now()
@@ -90,6 +83,7 @@ func (repo *MasterDataOpdRepository) BulkInsert(
 	defer stmt.Close()
 
 	inserted := 0
+
 	for _, opd := range opds {
 		_, err := stmt.ExecContext(
 			ctx,
@@ -107,11 +101,14 @@ func (repo *MasterDataOpdRepository) BulkInsert(
 			repo.Logger.Error(
 				"failed to insert opd",
 				"op", op,
+				"sync_id", syncID,
 				"opd_kode", opd.OpdKode,
 				"error", err,
 			)
+
 			return inserted, err
 		}
+
 		inserted++
 	}
 
@@ -119,6 +116,7 @@ func (repo *MasterDataOpdRepository) BulkInsert(
 		repo.Logger.Error(
 			"failed to commit transaction",
 			"op", op,
+			"sync_id", syncID,
 			"error", err,
 		)
 		return inserted, err
@@ -227,4 +225,82 @@ func (repo *MasterDataOpdRepository) FindAllOpdBySnapshotId(
 	)
 
 	return opds, nil
+}
+
+func (repo *MasterDataOpdRepository) FindOpdByKode(
+	ctx context.Context,
+	snapshotId string,
+	kodeOpd string,
+) (domain.DataMasterOpd, error) {
+	const op = "opd-repo-FindOpdByKode"
+
+	repo.Logger.Debug(
+		"find opd by kode",
+		"op", op,
+		"snapshot_id", snapshotId,
+		"opd_kode", kodeOpd,
+	)
+
+	const query = `
+		SELECT
+			id,
+			opd_kode,
+			opd_level,
+			opd_nama,
+			opd_jabatan,
+			eselon_kode,
+			eselon_nama,
+			sync_id,
+			sync_from,
+			sync_at,
+			created_at,
+			updated_at
+		FROM data_master_opd
+		WHERE sync_id = $1
+		  AND opd_kode = $2
+		LIMIT 1
+	`
+
+	var opd domain.DataMasterOpd
+
+	err := repo.DB.QueryRowContext(
+		ctx,
+		query,
+		snapshotId,
+		kodeOpd,
+	).Scan(
+		&opd.ID,
+		&opd.OpdKode,
+		&opd.OpdLevel,
+		&opd.OpdNama,
+		&opd.OpdJabatan,
+		&opd.EselonKode,
+		&opd.EselonNama,
+		&opd.SyncID,
+		&opd.SyncFrom,
+		&opd.SyncAt,
+		&opd.CreatedAt,
+		&opd.UpdatedAt,
+	)
+
+	if err != nil {
+		repo.Logger.Error(
+			"failed to find opd",
+			"op", op,
+			"snapshot_id", snapshotId,
+			"opd_kode", kodeOpd,
+			"error", err,
+		)
+		return opd, err
+	}
+
+	repo.Logger.Debug(
+		"successfully found opd",
+		"op", op,
+		"snapshot_id", snapshotId,
+		"opd_kode", kodeOpd,
+		"opd_id", opd.ID,
+	)
+
+	return opd, nil
 }

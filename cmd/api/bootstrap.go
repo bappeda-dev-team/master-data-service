@@ -12,6 +12,10 @@ import (
 	opdClient "master-data-service/internal/opd/client"
 	opdRepository "master-data-service/internal/opd/repository"
 	opdService "master-data-service/internal/opd/service"
+
+	jabatanClient "master-data-service/internal/jabatan/client"
+	jabatanRepository "master-data-service/internal/jabatan/repository"
+	jabatanService "master-data-service/internal/jabatan/service"
 )
 
 // buildApplication adalah fungsi untuk injeksi repository dan service.
@@ -28,6 +32,7 @@ func buildApplication(
 
 	masterSyncRepo := masterSyncRepository.NewMasterSyncRepository(db, logger)
 	dataMasterOpdRepo := opdRepository.NewMasterDataOpdRepository(db, logger)
+	dataMasterJabatanRepo := jabatanRepository.NewMasterDataJabatanRepository(db, logger)
 
 	// =========================================================
 	// SERVICE
@@ -38,8 +43,16 @@ func buildApplication(
 		logger,
 	)
 
-	simpegClient := opdClient.NewSimpegClient(
+	simpegClientOpd := opdClient.NewSimpegClient(
 		opdClient.SimpegConfig{
+			BaseURL: cfg.Simpeg.BaseURL,
+			ApiPath: cfg.Simpeg.ApiPath,
+		},
+		logger,
+	)
+
+	simpegClientJabatan := jabatanClient.NewSimpegClient(
+		jabatanClient.SimpegConfig{
 			BaseURL: cfg.Simpeg.BaseURL,
 			ApiPath: cfg.Simpeg.ApiPath,
 		},
@@ -49,7 +62,14 @@ func buildApplication(
 	opdSvc := opdService.NewDataMasterOpdService(
 		dataMasterOpdRepo,
 		masterSyncSvc,
-		simpegClient,
+		simpegClientOpd,
+		logger,
+	)
+
+	jabatanSvc := jabatanService.NewMasterDataJabatanService(
+		dataMasterJabatanRepo,
+		masterSyncSvc,
+		simpegClientJabatan,
 		logger,
 	)
 
@@ -64,6 +84,8 @@ func buildApplication(
 		MasterSync: masterSyncSvc,
 
 		Opd: opdSvc,
+
+		Jabatan: jabatanSvc,
 	}
 
 	return app
