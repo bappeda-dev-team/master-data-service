@@ -5,6 +5,7 @@ type SyncType string
 const (
 	SyncTypeOpd     SyncType = "OPD"
 	SyncTypeJabatan SyncType = "JABATAN"
+	SyncTypePegawai SyncType = "PEGAWAI"
 )
 
 func (j SyncType) IsValid() bool {
@@ -15,6 +16,9 @@ func (j SyncType) IsValid() bool {
 		return true
 	case
 		SyncTypeJabatan:
+		return true
+	case
+		SyncTypePegawai:
 		return true
 	}
 	return false

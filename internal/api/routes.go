@@ -33,5 +33,9 @@ func (app *Application) Routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/jabatan/find", app.FindJabatanByKodeOpd)
 	router.HandlerFunc(http.MethodPost, "/jabatan/sync", app.SyncDataMasterJabatan)
 
+	// pegawai
+	router.HandlerFunc(http.MethodGet, "/pegawai/find", app.FindPegawaiByKodeOpd)
+	router.HandlerFunc(http.MethodPost, "/pegawai/sync", app.SyncDataMasterPegawai)
+
 	return app.recoverPanic(router)
 }

@@ -5,6 +5,7 @@ import (
 	jabatan "master-data-service/internal/jabatan/service"
 	masterSync "master-data-service/internal/master_sync/service"
 	opd "master-data-service/internal/opd/service"
+	pegawai "master-data-service/internal/pegawai/service"
 )
 
 const Version = "1.0.0"
@@ -39,4 +40,6 @@ type Application struct {
 	Opd *opd.DataMasterOpdService
 
 	Jabatan *jabatan.MasterDataJabatanService
+
+	Pegawai *pegawai.MasterDataPegawaiService
 }

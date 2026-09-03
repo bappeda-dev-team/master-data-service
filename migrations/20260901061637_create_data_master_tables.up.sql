@@ -82,7 +82,8 @@ CREATE TABLE data_master_jabatan (
             sync_id,
             opd_kode,
             jenis_jabatan_kode,
-            jabatan_kode
+            jabatan_kode,
+            jenjang_jabatan_kode
         ),
 
     CONSTRAINT fk_data_master_jabatan_sync

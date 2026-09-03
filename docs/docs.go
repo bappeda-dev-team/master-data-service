@@ -20,6 +20,114 @@ const docTemplate = `{
     "paths": {
         "/healthcheck": {
             "get": {
+                "description": "checking if this service is accessible",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "healthcheck",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_HealthcheckResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/jabatan/find": {
+            "get": {
+                "description": "Get all master Jabatan for a specific OPD.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jabatan"
+                ],
+                "summary": "Get Jabatan By Kode OPD",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-array_web_DataMasterJabatanResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/jabatan/sync": {
+            "post": {
+                "description": "Synchronize master Jabatan data for a specific OPD from the upstream SIMPEG service.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jabatan"
+                ],
+                "summary": "Sync Data Master Jabatan By Kode OPD",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_MasterSyncResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/opd/findall": {
+            "get": {
                 "description": "Get all opd",
                 "produces": [
                     "application/json"
@@ -43,9 +151,174 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/opd/sync": {
+            "post": {
+                "description": "Update OPD Data From Upstream",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "opd"
+                ],
+                "summary": "Sync Data Master Opd",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_MasterSyncResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pegawai/find": {
+            "get": {
+                "description": "Get all Pegawai By Kode Opd",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pegawai"
+                ],
+                "summary": "Get all Pegawai",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-array_web_DataMasterPegawaiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pegawai/sync": {
+            "post": {
+                "description": "Synchronize master Pegawai data for a specific OPD from the upstream SIMPEG service.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pegawai"
+                ],
+                "summary": "Sync Data Master Pegawai",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_MasterSyncResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "domain.SyncStatus": {
+            "type": "string",
+            "enum": [
+                "RUNNING",
+                "SUCCESS",
+                "PARTIAL",
+                "FAILED"
+            ],
+            "x-enum-varnames": [
+                "SyncStatusRunning",
+                "SyncStatusSuccess",
+                "SyncStatusPartial",
+                "SyncStatusFailed"
+            ]
+        },
+        "domain.SyncType": {
+            "type": "string",
+            "enum": [
+                "OPD",
+                "JABATAN",
+                "PEGAWAI"
+            ],
+            "x-enum-varnames": [
+                "SyncTypeOpd",
+                "SyncTypeJabatan",
+                "SyncTypePegawai"
+            ]
+        },
+        "web.DataMasterJabatanResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "jabatan_kode": {
+                    "type": "string"
+                },
+                "jabatan_nama": {
+                    "type": "string"
+                },
+                "jenis_jabatan_kode": {
+                    "type": "string"
+                },
+                "jenis_jabatan_nama": {
+                    "type": "string"
+                },
+                "jenjang_jabatan_kode": {
+                    "type": "string"
+                },
+                "jenjang_jabatan_nama": {
+                    "type": "string"
+                },
+                "opd_kode": {
+                    "type": "string"
+                }
+            }
+        },
         "web.DataMasterOpdResponse": {
             "type": "object",
             "properties": {
@@ -68,6 +341,80 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "opd_nama": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.DataMasterPegawaiResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "opd_kode": {
+                    "type": "string"
+                },
+                "opd_level": {
+                    "type": "integer"
+                },
+                "opd_nama": {
+                    "type": "string"
+                },
+                "pegawai_aktif_id": {
+                    "type": "string"
+                },
+                "pegawai_eselon_kode": {
+                    "type": "string"
+                },
+                "pegawai_eselon_nama": {
+                    "type": "string"
+                },
+                "pegawai_golongan_kode": {
+                    "type": "string"
+                },
+                "pegawai_golongan_nama": {
+                    "type": "string"
+                },
+                "pegawai_golongan_pangkat": {
+                    "type": "string"
+                },
+                "pegawai_golongan_tmt": {
+                    "type": "string"
+                },
+                "pegawai_jabatan_kode": {
+                    "type": "string"
+                },
+                "pegawai_jabatan_terakhir": {
+                    "type": "string"
+                },
+                "pegawai_jenis": {
+                    "type": "string"
+                },
+                "pegawai_jenis_jabatan_kode": {
+                    "type": "string"
+                },
+                "pegawai_jenis_jabatan_nama": {
+                    "type": "string"
+                },
+                "pegawai_jenis_kelamin": {
+                    "type": "string"
+                },
+                "pegawai_lahir_tanggal": {
+                    "type": "string"
+                },
+                "pegawai_lahir_tempat": {
+                    "type": "string"
+                },
+                "pegawai_nama": {
+                    "type": "string"
+                },
+                "pegawai_nip": {
+                    "type": "string"
+                },
+                "pegawai_pensiun_tmt": {
+                    "type": "string"
+                },
+                "pegawai_status": {
                     "type": "string"
                 }
             }
@@ -100,6 +447,75 @@ const docTemplate = `{
                 }
             }
         },
+        "web.MasterSyncResponse": {
+            "type": "object",
+            "properties": {
+                "finished_at": {
+                    "type": "string",
+                    "example": "2026-09-01T20:00:13Z"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "started_at": {
+                    "type": "string",
+                    "example": "2026-09-01T20:00:00Z"
+                },
+                "status": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.SyncStatus"
+                        }
+                    ],
+                    "example": "SUCCESS"
+                },
+                "sync_from": {
+                    "type": "string",
+                    "example": "simpeg-adapter"
+                },
+                "sync_type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.SyncType"
+                        }
+                    ],
+                    "example": "pegawai"
+                },
+                "total_data": {
+                    "type": "integer",
+                    "example": 1250
+                },
+                "total_failed": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "total_success": {
+                    "type": "integer",
+                    "example": 1250
+                }
+            }
+        },
+        "web.Response-array_web_DataMasterJabatanResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.DataMasterJabatanResponse"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "web.Response-array_web_DataMasterOpdResponse": {
             "type": "object",
             "properties": {
@@ -120,6 +536,26 @@ const docTemplate = `{
                 }
             }
         },
+        "web.Response-array_web_DataMasterPegawaiResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.DataMasterPegawaiResponse"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "web.Response-web_HealthcheckResponse": {
             "type": "object",
             "properties": {
@@ -128,6 +564,23 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/web.HealthcheckResponse"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.Response-web_MasterSyncResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/web.MasterSyncResponse"
                 },
                 "message": {
                     "type": "string"

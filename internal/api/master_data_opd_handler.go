@@ -15,7 +15,7 @@ import (
 // @Produce json
 // @Success 200	{object} web.Response[[]opdWeb.DataMasterOpdResponse]
 // @Failure 500 {object} web.ErrorResponse
-// @Router /healthcheck [get]
+// @Router /opd/findall [get]
 func (app *Application) FindAllOpd(w http.ResponseWriter, r *http.Request) {
 	masterOpdData, err := app.Opd.FindAllOpd(r.Context())
 	if err != nil {
@@ -44,7 +44,7 @@ func (app *Application) FindAllOpd(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Success 200	{object} web.Response[masterSyncWeb.MasterSyncResponse]
 // @Failure 500 {object} web.ErrorResponse
-// @Router /healthcheck [get]
+// @Router /opd/sync [post]
 func (app *Application) SyncDataMasterOpd(w http.ResponseWriter, r *http.Request) {
 	syncResult, err := app.Opd.SyncDataOpd(r.Context())
 	if err != nil {
