@@ -91,11 +91,20 @@ func (s *DataMasterOpdService) SyncDataOpd(
 		})
 	}
 
+	totalData := len(opds)
+
 	// INSERT DATA DARI SIMPEG RESPONSE
 	inserted, err := s.Repo.BulkInsert(ctx, opds, syncID, syncFrom)
 	if err != nil {
 		s.finishSync(ctx, sync, len(opds), 0, len(opds), masterSyncDomain.SyncStatusFailed)
 		return masterSyncWeb.MasterSyncResponse{}, err
+	}
+
+	status := masterSyncDomain.SyncStatusSuccess
+	totalFailed := totalData - inserted
+
+	if totalFailed > 0 {
+		status = masterSyncDomain.SyncStatusPartial
 	}
 
 	// FINISH SYNC
@@ -109,10 +118,10 @@ func (s *DataMasterOpdService) SyncDataOpd(
 		SyncType:     masterSyncDomain.SyncTypeOpd,
 		StartedAt:    sync.StartedAt,
 		FinishedAt:   sync.FinishedAt,
-		Status:       masterSyncDomain.SyncStatusSuccess,
-		TotalData:    len(opds),
+		Status:       status,
+		TotalData:    totalData,
 		TotalSuccess: inserted,
-		TotalFailed:  0,
+		TotalFailed:  totalFailed,
 	}, nil
 }
 
@@ -135,10 +144,11 @@ func (s *DataMasterOpdService) finishSync(
 	return s.SyncService.Finish(ctx, sync)
 }
 
+// ONLY GET OPD LEVEL 1
 func (s *DataMasterOpdService) FindAllOpd(
 	ctx context.Context,
 ) ([]web.DataMasterOpdResponse, error) {
-	s.Logger.Info("FindAllOpd")
+	s.Logger.Info("FindAllOpd LEVEL 1")
 
 	const syncFrom = "SIMPEG"
 

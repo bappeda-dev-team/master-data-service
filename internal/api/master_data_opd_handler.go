@@ -55,7 +55,7 @@ func (app *Application) SyncDataMasterOpd(w http.ResponseWriter, r *http.Request
 	data := web.Response[masterSyncWeb.MasterSyncResponse]{
 		Code:    http.StatusOK,
 		Status:  http.StatusText(http.StatusOK),
-		Message: "DATA MASTER OPD",
+		Message: SyncMessage(syncResult.Status),
 		Data:    syncResult,
 	}
 

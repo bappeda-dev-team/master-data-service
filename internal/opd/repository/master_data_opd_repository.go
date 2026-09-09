@@ -160,6 +160,7 @@ func (repo *MasterDataOpdRepository) FindAllOpdBySnapshotId(
 			updated_at
 		FROM data_master_opd
 		WHERE sync_id = $1
+		AND opd_level = 1
 		ORDER BY opd_kode
 	`
 
