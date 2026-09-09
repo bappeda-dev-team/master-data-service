@@ -93,3 +93,9 @@ func (app *Application) FailedValidationResponse(w http.ResponseWriter, r *http.
 func (app *Application) UnprocessableResponse(w http.ResponseWriter, r *http.Request, message string) {
 	app.errorResponse(w, r, http.StatusUnprocessableEntity, message)
 }
+
+// the conflictResponse() method will be used to send a 409 Conflict
+// status code and JSON response to the client
+func (app *Application) ConflictResponse(w http.ResponseWriter, r *http.Request, message string) {
+	app.errorResponse(w, r, http.StatusConflict, message)
+}

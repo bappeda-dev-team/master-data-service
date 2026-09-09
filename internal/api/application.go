@@ -38,6 +38,9 @@ type Application struct {
 	MasterSync *masterSync.MasterSyncService
 
 	Opd *opd.DataMasterOpdService
+	// mapping dari master data ke sumber
+	// untuk menghubungkan existing kode dengan kode data master
+	MappingOpd *opd.MappingOpdService
 
 	Jabatan *jabatan.MasterDataJabatanService
 

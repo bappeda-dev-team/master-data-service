@@ -36,6 +36,7 @@ func buildApplication(
 
 	masterSyncRepo := masterSyncRepository.NewMasterSyncRepository(db, logger)
 	dataMasterOpdRepo := opdRepository.NewMasterDataOpdRepository(db, logger)
+	mappingOpdRepo := opdRepository.NewMappingOpdRepository(db, logger)
 	dataMasterJabatanRepo := jabatanRepository.NewMasterDataJabatanRepository(db, logger)
 	dataMasterPegawaiRepo := pegawaiRepository.NewMasterDataPegawaiRepository(db, logger)
 
@@ -79,6 +80,11 @@ func buildApplication(
 		logger,
 	)
 
+	mappingOpdSvc := opdService.NewMappingOpdService(
+		mappingOpdRepo,
+		logger,
+	)
+
 	jabatanSvc := jabatanService.NewMasterDataJabatanService(
 		dataMasterJabatanRepo,
 		masterSyncSvc,
@@ -104,6 +110,9 @@ func buildApplication(
 		MasterSync: masterSyncSvc,
 
 		Opd: opdSvc,
+		// mapping dari master data ke sumber
+		// untuk menghubungkan existing kode dengan kode data master
+		MappingOpd: mappingOpdSvc,
 
 		Jabatan: jabatanSvc,
 
