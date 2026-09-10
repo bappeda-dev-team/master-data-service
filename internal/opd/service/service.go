@@ -115,7 +115,7 @@ func (s *DataMasterOpdService) SyncDataOpd(
 	return masterSyncWeb.MasterSyncResponse{
 		ID:           syncID,
 		SyncFrom:     syncFrom,
-		SyncType:     masterSyncDomain.SyncTypeOpd,
+		SyncType:     sync.SyncType,
 		StartedAt:    sync.StartedAt,
 		FinishedAt:   sync.FinishedAt,
 		Status:       status,

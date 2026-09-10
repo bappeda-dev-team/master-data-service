@@ -142,7 +142,7 @@ func (repo *MasterDataPegawaiRepository) BulkInsert(
 	inserted := 0
 
 	for _, pegawai := range pegawais {
-		_, err := stmt.ExecContext(
+		result, err := stmt.ExecContext(
 			ctx,
 
 			pegawai.OpdKode,
@@ -192,6 +192,23 @@ func (repo *MasterDataPegawaiRepository) BulkInsert(
 
 			return inserted, err
 		}
+
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return inserted, err
+		}
+
+		if rowsAffected == 1 {
+			inserted++
+			continue
+		}
+
+		repo.Logger.Debug(
+			"pegawai already exists, skip",
+			"op", op,
+			"sync_id", syncID,
+			"pegawai_nip", pegawai.PegawaiNIP,
+		)
 
 		inserted++
 	}

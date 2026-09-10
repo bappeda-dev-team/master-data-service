@@ -54,6 +54,7 @@ func (s *MasterDataPegawaiService) SyncDataPegawai(
 		ID:        syncID,
 		SyncFrom:  syncFrom,
 		SyncType:  masterSyncDomain.SyncTypePegawai,
+		ScopeKey:  kodeOpd,
 		StartedAt: time.Now(),
 		Status:    masterSyncDomain.SyncStatusRunning,
 	}
@@ -202,7 +203,8 @@ func (s *MasterDataPegawaiService) SyncDataPegawai(
 	return masterSyncWeb.MasterSyncResponse{
 		ID:           syncID,
 		SyncFrom:     syncFrom,
-		SyncType:     masterSyncDomain.SyncTypePegawai,
+		SyncType:     sync.SyncType,
+		ScopeKey:     sync.ScopeKey,
 		StartedAt:    sync.StartedAt,
 		FinishedAt:   sync.FinishedAt,
 		Status:       masterSyncDomain.SyncStatusSuccess,
@@ -231,6 +233,7 @@ func (s *MasterDataPegawaiService) finishSync(
 
 	return s.SyncService.Finish(ctx, sync)
 }
+
 func parseDate(value string) (*time.Time, error) {
 	if value == "" {
 		return nil, nil
@@ -283,6 +286,7 @@ func (s *MasterDataPegawaiService) FindAllPegawaiByKodeOpd(
 	snapshot := masterSyncDomain.DataMasterSync{
 		SyncType: masterSyncDomain.SyncTypePegawai,
 		SyncFrom: syncFrom,
+		ScopeKey: kodeOpd,
 		Status:   masterSyncDomain.SyncStatusSuccess,
 	}
 
@@ -295,6 +299,7 @@ func (s *MasterDataPegawaiService) FindAllPegawaiByKodeOpd(
 				"op", op,
 				"sync_type", snapshot.SyncType,
 				"sync_from", snapshot.SyncFrom,
+				"scope_key", snapshot.ScopeKey,
 			)
 
 			return []web.DataMasterPegawaiResponse{}, nil
@@ -305,6 +310,7 @@ func (s *MasterDataPegawaiService) FindAllPegawaiByKodeOpd(
 			"op", op,
 			"sync_type", snapshot.SyncType,
 			"sync_from", snapshot.SyncFrom,
+			"scope_key", snapshot.ScopeKey,
 			"error", err,
 		)
 

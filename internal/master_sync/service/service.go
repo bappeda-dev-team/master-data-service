@@ -33,6 +33,7 @@ func (s *MasterSyncService) Create(
 			"create sync record",
 			"id", sync.ID,
 			"sync_type", sync.SyncType,
+			"scope_key", sync.ScopeKey,
 			"err", err,
 		)
 		return err
@@ -49,6 +50,7 @@ func (s *MasterSyncService) Finish(
 			"finish sync record",
 			"id", sync.ID,
 			"sync_type", sync.SyncType,
+			"scope_key", sync.ScopeKey,
 			"err", err,
 		)
 		return err
@@ -75,6 +77,7 @@ func (s *MasterSyncService) GetActiveSnapshot(
 			"get active snapshot failed",
 			"sync_type", snap.SyncType,
 			"sync_from", snap.SyncFrom,
+			"scope_key", snap.ScopeKey,
 			"err", err,
 		)
 		return "", nil

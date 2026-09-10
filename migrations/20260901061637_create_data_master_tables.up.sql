@@ -3,6 +3,7 @@ CREATE TABLE data_master_sync (
 
     sync_from VARCHAR(255) NOT NULL,
     sync_type VARCHAR(50) NOT NULL,
+    scope_key VARCHAR(255) NULL,
 
     started_at TIMESTAMP NOT NULL,
     finished_at TIMESTAMP NULL,
@@ -18,6 +19,7 @@ CREATE INDEX idx_data_master_sync_source
     ON data_master_sync (
         sync_from,
         sync_type,
+        scope_key,
         started_at
     );
 
@@ -38,9 +40,6 @@ CREATE TABLE data_master_opd (
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT uk_data_master_opd
-        UNIQUE (sync_id, opd_kode),
 
     CONSTRAINT fk_data_master_opd_sync
         FOREIGN KEY (sync_id)
@@ -76,15 +75,6 @@ CREATE TABLE data_master_jabatan (
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT uk_data_master_jabatan
-        UNIQUE (
-            sync_id,
-            opd_kode,
-            jenis_jabatan_kode,
-            jabatan_kode,
-            jenjang_jabatan_kode
-        ),
 
     CONSTRAINT fk_data_master_jabatan_sync
         FOREIGN KEY (sync_id)
@@ -143,9 +133,6 @@ CREATE TABLE data_master_pegawai (
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT uk_data_master_pegawai
-        UNIQUE (sync_id, pegawai_nip),
 
     CONSTRAINT fk_data_master_pegawai_sync
         FOREIGN KEY (sync_id)

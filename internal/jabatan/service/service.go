@@ -58,6 +58,7 @@ func (s *MasterDataJabatanService) SyncDataJabatan(
 		ID:        syncID,
 		SyncFrom:  syncFrom,
 		SyncType:  masterSyncDomain.SyncTypeJabatan,
+		ScopeKey:  kodeOpd,
 		StartedAt: time.Now(),
 		Status:    masterSyncDomain.SyncStatusRunning,
 	}
@@ -104,7 +105,8 @@ func (s *MasterDataJabatanService) SyncDataJabatan(
 	return masterSyncWeb.MasterSyncResponse{
 		ID:           syncID,
 		SyncFrom:     syncFrom,
-		SyncType:     masterSyncDomain.SyncTypeJabatan,
+		SyncType:     sync.SyncType,
+		ScopeKey:     sync.ScopeKey,
 		StartedAt:    sync.StartedAt,
 		FinishedAt:   sync.FinishedAt,
 		Status:       masterSyncDomain.SyncStatusSuccess,
@@ -149,6 +151,7 @@ func (s *MasterDataJabatanService) FindAllJabatanByKodeOpd(
 	snapshot := masterSyncDomain.DataMasterSync{
 		SyncType: masterSyncDomain.SyncTypeJabatan,
 		SyncFrom: syncFrom,
+		ScopeKey: kodeOpd,
 		Status:   masterSyncDomain.SyncStatusSuccess,
 	}
 
@@ -161,6 +164,7 @@ func (s *MasterDataJabatanService) FindAllJabatanByKodeOpd(
 				"op", op,
 				"sync_type", snapshot.SyncType,
 				"sync_from", snapshot.SyncFrom,
+				"scope_key", snapshot.ScopeKey,
 			)
 
 			return []web.DataMasterJabatanResponse{}, nil

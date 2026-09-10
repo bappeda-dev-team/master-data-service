@@ -42,13 +42,14 @@ func (repo *MasterSyncRepository) Create(
 			id,
 			sync_from,
 			sync_type,
+			scope_key,
 			started_at,
 			status,
 			total_data,
 			total_success,
 			total_failed
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	`
 
 	_, err := repo.DB.ExecContext(
@@ -57,6 +58,7 @@ func (repo *MasterSyncRepository) Create(
 		req.ID,
 		req.SyncFrom,
 		req.SyncType,
+		req.ScopeKey,
 		req.StartedAt,
 		req.Status,
 		req.TotalData,
@@ -146,6 +148,7 @@ func (repo *MasterSyncRepository) FindActiveSnapshot(
 		"op", op,
 		"sync_type", req.SyncType,
 		"sync_from", req.SyncFrom,
+		"scope_key", req.ScopeKey,
 	)
 
 	const query = `
@@ -153,6 +156,7 @@ func (repo *MasterSyncRepository) FindActiveSnapshot(
 		FROM data_master_sync
 		WHERE sync_type = $1
 		  AND sync_from = $2
+		  AND scope_key = $3
 		  AND status = 'SUCCESS'
 		  AND finished_at IS NOT NULL
 		ORDER BY finished_at DESC
@@ -166,6 +170,7 @@ func (repo *MasterSyncRepository) FindActiveSnapshot(
 		query,
 		req.SyncType,
 		req.SyncFrom,
+		req.ScopeKey,
 	).Scan(&id)
 
 	if err != nil {
@@ -174,6 +179,7 @@ func (repo *MasterSyncRepository) FindActiveSnapshot(
 			"op", op,
 			"sync_type", req.SyncType,
 			"sync_from", req.SyncFrom,
+			"scope_key", req.ScopeKey,
 			"status", req.Status,
 			"error", err,
 		)
@@ -187,6 +193,7 @@ func (repo *MasterSyncRepository) FindActiveSnapshot(
 		"snapshot_id", id,
 		"sync_type", req.SyncType,
 		"sync_from", req.SyncFrom,
+		"scope_key", req.ScopeKey,
 	)
 
 	return id, nil

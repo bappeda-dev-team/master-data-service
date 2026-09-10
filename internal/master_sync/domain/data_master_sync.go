@@ -6,6 +6,7 @@ type DataMasterSync struct {
 	ID           string
 	SyncFrom     string
 	SyncType     SyncType
+	ScopeKey     string
 	StartedAt    time.Time
 	FinishedAt   *time.Time
 	Status       SyncStatus
