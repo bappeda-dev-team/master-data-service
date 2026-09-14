@@ -51,7 +51,7 @@ func (app *Application) FindJabatanByKodeOpd(
 // @Description Synchronize master Jabatan data for a specific OPD from the upstream SIMPEG service.
 // @Tags jabatan
 // @Produce json
-// @Param kodeOpd query string true "Kode OPD"
+// @Param request body masterSyncWeb.MasterSyncRequest true "Sync Pegawai Request"
 // @Success 200 {object} web.Response[masterSyncWeb.MasterSyncResponse]
 // @Failure 400 {object} web.ErrorResponse
 // @Failure 500 {object} web.ErrorResponse
@@ -60,11 +60,16 @@ func (app *Application) SyncDataMasterJabatan(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	kodeOpd := r.URL.Query().Get("kodeOpd")
+	var req masterSyncWeb.MasterSyncRequest
+
+	if err := app.ReadJSON(w, r, &req); err != nil {
+		app.BadRequestResponse(w, r, err)
+		return
+	}
 
 	syncResult, err := app.Jabatan.SyncDataJabatan(
 		r.Context(),
-		kodeOpd,
+		req,
 	)
 	if err != nil {
 		app.ServerErrorResponse(w, r, err)

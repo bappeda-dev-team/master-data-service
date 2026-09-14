@@ -10,43 +10,60 @@ import (
 	"master-data-service/internal/pegawai/domain"
 	"master-data-service/internal/pegawai/repository"
 	"master-data-service/internal/pegawai/web"
+	"sort"
 	"strconv"
 	"time"
 
 	masterSyncDomain "master-data-service/internal/master_sync/domain"
 	masterSyncWeb "master-data-service/internal/master_sync/web"
+	opdRepository "master-data-service/internal/opd/repository"
 
 	"github.com/google/uuid"
 )
 
 type MasterDataPegawaiService struct {
-	Repo        *repository.MasterDataPegawaiRepository
-	SyncService SnapshotService
-	Client      *client.SimpegClient
-	Logger      *slog.Logger
+	Repo                 *repository.MasterDataPegawaiRepository
+	SyncService          SnapshotService
+	Client               *client.SimpegClient
+	MappingOpdRepository *opdRepository.MappingOpdRepository
+	Logger               *slog.Logger
 }
 
 func NewMasterDataPegawaiService(
 	repo *repository.MasterDataPegawaiRepository,
 	syncService SnapshotService,
 	simpegClient *client.SimpegClient,
+	mappingOpdRepository *opdRepository.MappingOpdRepository,
 	logger *slog.Logger,
 ) *MasterDataPegawaiService {
 	return &MasterDataPegawaiService{
-		Repo:        repo,
-		SyncService: syncService,
-		Client:      simpegClient,
-		Logger:      logger,
+		Repo:                 repo,
+		SyncService:          syncService,
+		Client:               simpegClient,
+		MappingOpdRepository: mappingOpdRepository,
+		Logger:               logger,
 	}
 }
 
 func (s *MasterDataPegawaiService) SyncDataPegawai(
 	ctx context.Context,
-	kodeOpd string,
+	req masterSyncWeb.MasterSyncRequest,
 ) (masterSyncWeb.MasterSyncResponse, error) {
 	s.Logger.Info("SyncDataPegawai")
 
+	// TODO: get from request
 	const syncFrom = "SIMPEG"
+	// mapping ke kode opd simpeg
+	mapping, err := s.MappingOpdRepository.FindBySumberAndKodeSumber(
+		ctx,
+		"EKAK",
+		req.KodeOpd,
+	)
+	if err != nil {
+		return masterSyncWeb.MasterSyncResponse{}, err
+	}
+
+	kodeOpd := mapping.KodeMaster
 
 	// CREATE SYNC RECORD
 	syncID := uuid.New().String()
@@ -272,10 +289,21 @@ func stringPtr(value string) *string {
 
 func (s *MasterDataPegawaiService) FindAllPegawaiByKodeOpd(
 	ctx context.Context,
-	kodeOpd string,
+	kodeOpdSumber string,
 ) ([]web.DataMasterPegawaiResponse, error) {
 	const op = "pegawai-service-FindAllPegawaiByKodeOpd"
+	// TODO: get from request
 	const syncFrom = "SIMPEG"
+	mapping, err := s.MappingOpdRepository.FindBySumberAndKodeSumber(
+		ctx,
+		"EKAK",
+		kodeOpdSumber,
+	)
+	if err != nil {
+		return []web.DataMasterPegawaiResponse{}, err
+	}
+
+	kodeOpd := mapping.KodeMaster
 
 	s.Logger.Info(
 		"find all pegawai by kode opd",
@@ -346,31 +374,21 @@ func (s *MasterDataPegawaiService) FindAllPegawaiByKodeOpd(
 			response,
 			web.DataMasterPegawaiResponse{
 				ID:                      pegawai.ID,
-				OpdKode:                 pegawai.OpdKode,
 				PegawaiNIP:              pegawai.PegawaiNIP,
 				PegawaiNama:             pegawai.PegawaiNama,
-				PegawaiJenisKelamin:     pegawai.PegawaiJenisKelamin,
-				PegawaiLahirTempat:      pegawai.PegawaiLahirTempat,
-				PegawaiLahirTanggal:     pegawai.PegawaiLahirTanggal,
-				PegawaiPensiunTMT:       pegawai.PegawaiPensiunTMT,
-				PegawaiAktifID:          pegawai.PegawaiAktifID,
-				PegawaiStatus:           pegawai.PegawaiStatus,
-				PegawaiJenis:            pegawai.PegawaiJenis,
-				PegawaiGolonganKode:     pegawai.PegawaiGolonganKode,
-				PegawaiGolonganNama:     pegawai.PegawaiGolonganNama,
-				PegawaiGolonganPangkat:  pegawai.PegawaiGolonganPangkat,
-				PegawaiGolonganTMT:      pegawai.PegawaiGolonganTMT,
 				PegawaiJenisJabatanKode: pegawai.PegawaiJenisJabatanKode,
-				PegawaiJenisJabatanNama: pegawai.PegawaiJenisJabatanNama,
-				PegawaiJabatanKode:      pegawai.PegawaiJabatanKode,
+				PegawaiJabatanKode:      pegawai.PegawaiJenisJabatanKode,
 				PegawaiJabatanTerakhir:  pegawai.PegawaiJabatanTerakhir,
-				PegawaiEselonKode:       pegawai.PegawaiEselonKode,
-				PegawaiEselonNama:       pegawai.PegawaiEselonNama,
-				OpdLevel:                pegawai.OpdLevel,
 				OpdNama:                 pegawai.OpdNama,
 			},
 		)
 	}
+	sort.SliceStable(response, func(i, j int) bool {
+		if response[i].PegawaiJenisJabatanKode != response[j].PegawaiJenisJabatanKode {
+			return *response[i].PegawaiJenisJabatanKode < *response[j].PegawaiJenisJabatanKode
+		}
+		return *response[i].PegawaiJabatanKode < *response[j].PegawaiJabatanKode
+	})
 
 	s.Logger.Debug(
 		"successfully found pegawai",

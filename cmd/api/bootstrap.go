@@ -89,6 +89,7 @@ func buildApplication(
 		dataMasterJabatanRepo,
 		masterSyncSvc,
 		simpegClientJabatan,
+		mappingOpdRepo,
 		logger,
 	)
 
@@ -96,6 +97,7 @@ func buildApplication(
 		dataMasterPegawaiRepo,
 		masterSyncSvc,
 		simpegClientPegawai,
+		mappingOpdRepo,
 		logger,
 	)
 

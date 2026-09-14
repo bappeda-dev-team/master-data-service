@@ -22,6 +22,15 @@ definitions:
     - SyncTypeOpd
     - SyncTypeJabatan
     - SyncTypePegawai
+  web.CreateMappingOpdRequest:
+    properties:
+      kode_master:
+        type: string
+      kode_sumber:
+        type: string
+      sumber:
+        type: string
+    type: object
   web.DataMasterJabatanResponse:
     properties:
       id:
@@ -125,6 +134,30 @@ definitions:
       version:
         type: string
     type: object
+  web.MappingOpdResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      kode_master:
+        type: string
+      kode_sumber:
+        type: string
+      sumber:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  web.MasterSyncRequest:
+    properties:
+      kode_opd:
+        example: 5.10.23
+        type: string
+      sync_from:
+        example: SIMPEG
+        type: string
+    type: object
   web.MasterSyncResponse:
     properties:
       finished_at:
@@ -132,6 +165,9 @@ definitions:
         type: string
       id:
         example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      scope_key:
+        example: "42"
         type: string
       started_at:
         example: "2026-09-01T20:00:00Z"
@@ -156,6 +192,16 @@ definitions:
       total_success:
         example: 1250
         type: integer
+    type: object
+  web.Response-any:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
     type: object
   web.Response-array_web_DataMasterJabatanResponse:
     properties:
@@ -196,12 +242,36 @@ definitions:
       status:
         type: string
     type: object
+  web.Response-array_web_MappingOpdResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/web.MappingOpdResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   web.Response-web_HealthcheckResponse:
     properties:
       code:
         type: integer
       data:
         $ref: '#/definitions/web.HealthcheckResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  web.Response-web_MappingOpdResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/web.MappingOpdResponse'
       message:
         type: string
       status:
@@ -216,6 +286,15 @@ definitions:
       message:
         type: string
       status:
+        type: string
+    type: object
+  web.UpdateMappingOpdRequest:
+    properties:
+      kode_master:
+        type: string
+      kode_sumber:
+        type: string
+      sumber:
         type: string
     type: object
 info:
@@ -275,11 +354,12 @@ paths:
       description: Synchronize master Jabatan data for a specific OPD from the upstream
         SIMPEG service.
       parameters:
-      - description: Kode OPD
-        in: query
-        name: kodeOpd
+      - description: Sync Pegawai Request
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/web.MasterSyncRequest'
       produces:
       - application/json
       responses:
@@ -298,6 +378,194 @@ paths:
       summary: Sync Data Master Jabatan By Kode OPD
       tags:
       - jabatan
+  /mapping-opd/create:
+    post:
+      consumes:
+      - application/json
+      description: Create mapping opd
+      parameters:
+      - description: Mapping OPD
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/web.CreateMappingOpdRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/web.Response-web_MappingOpdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Create mapping opd
+      tags:
+      - mapping-opd
+  /mapping-opd/delete/{id}:
+    delete:
+      description: Delete mapping opd
+      parameters:
+      - description: Mapping OPD ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Delete mapping opd
+      tags:
+      - mapping-opd
+  /mapping-opd/find-by-kode-sumber:
+    get:
+      description: Get mapping opd by kode sumber
+      parameters:
+      - description: Sumber mapping
+        in: query
+        name: sumber
+        required: true
+        type: string
+      - description: Kode OPD dari sumber
+        in: query
+        name: kode_sumber
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response-web_MappingOpdResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get mapping opd by kode sumber
+      tags:
+      - mapping-opd
+  /mapping-opd/find/{id}:
+    get:
+      description: Get mapping opd by ID
+      parameters:
+      - description: Mapping OPD ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response-web_MappingOpdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get mapping opd by ID
+      tags:
+      - mapping-opd
+  /mapping-opd/findall:
+    get:
+      description: Get all mapping opd
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response-array_web_MappingOpdResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get all mapping opd
+      tags:
+      - mapping-opd
+  /mapping-opd/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update mapping opd
+      parameters:
+      - description: Mapping OPD ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Mapping OPD
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/web.UpdateMappingOpdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response-web_MappingOpdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Update mapping opd
+      tags:
+      - mapping-opd
   /opd/findall:
     get:
       description: Get all opd
@@ -364,11 +632,12 @@ paths:
       description: Synchronize master Pegawai data for a specific OPD from the upstream
         SIMPEG service.
       parameters:
-      - description: Kode OPD
-        in: query
-        name: kodeOpd
+      - description: Sync Pegawai Request
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/web.MasterSyncRequest'
       produces:
       - application/json
       responses:

@@ -97,11 +97,13 @@ const docTemplate = `{
                 "summary": "Sync Data Master Jabatan By Kode OPD",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Kode OPD",
-                        "name": "kodeOpd",
-                        "in": "query",
-                        "required": true
+                        "description": "Sync Pegawai Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.MasterSyncRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -113,6 +115,291 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mapping-opd/create": {
+            "post": {
+                "description": "Create mapping opd",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mapping-opd"
+                ],
+                "summary": "Create mapping opd",
+                "parameters": [
+                    {
+                        "description": "Mapping OPD",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.CreateMappingOpdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_MappingOpdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mapping-opd/delete/{id}": {
+            "delete": {
+                "description": "Delete mapping opd",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mapping-opd"
+                ],
+                "summary": "Delete mapping opd",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Mapping OPD ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-any"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mapping-opd/find-by-kode-sumber": {
+            "get": {
+                "description": "Get mapping opd by kode sumber",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mapping-opd"
+                ],
+                "summary": "Get mapping opd by kode sumber",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sumber mapping",
+                        "name": "sumber",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Kode OPD dari sumber",
+                        "name": "kode_sumber",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_MappingOpdResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mapping-opd/find/{id}": {
+            "get": {
+                "description": "Get mapping opd by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mapping-opd"
+                ],
+                "summary": "Get mapping opd by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Mapping OPD ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_MappingOpdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mapping-opd/findall": {
+            "get": {
+                "description": "Get all mapping opd",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mapping-opd"
+                ],
+                "summary": "Get all mapping opd",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-array_web_MappingOpdResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mapping-opd/update/{id}": {
+            "put": {
+                "description": "Update mapping opd",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mapping-opd"
+                ],
+                "summary": "Update mapping opd",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Mapping OPD ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Mapping OPD",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.UpdateMappingOpdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_MappingOpdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
                         "schema": {
                             "$ref": "#/definitions/web.ErrorResponse"
                         }
@@ -231,11 +518,13 @@ const docTemplate = `{
                 "summary": "Sync Data Master Pegawai",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Kode OPD",
-                        "name": "kodeOpd",
-                        "in": "query",
-                        "required": true
+                        "description": "Sync Pegawai Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.MasterSyncRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -289,6 +578,20 @@ const docTemplate = `{
                 "SyncTypeJabatan",
                 "SyncTypePegawai"
             ]
+        },
+        "web.CreateMappingOpdRequest": {
+            "type": "object",
+            "properties": {
+                "kode_master": {
+                    "type": "string"
+                },
+                "kode_sumber": {
+                    "type": "string"
+                },
+                "sumber": {
+                    "type": "string"
+                }
+            }
         },
         "web.DataMasterJabatanResponse": {
             "type": "object",
@@ -447,6 +750,42 @@ const docTemplate = `{
                 }
             }
         },
+        "web.MappingOpdResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "kode_master": {
+                    "type": "string"
+                },
+                "kode_sumber": {
+                    "type": "string"
+                },
+                "sumber": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.MasterSyncRequest": {
+            "type": "object",
+            "properties": {
+                "kode_opd": {
+                    "type": "string",
+                    "example": "5.10.23"
+                },
+                "sync_from": {
+                    "type": "string",
+                    "example": "SIMPEG"
+                }
+            }
+        },
         "web.MasterSyncResponse": {
             "type": "object",
             "properties": {
@@ -457,6 +796,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string",
                     "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "scope_key": {
+                    "type": "string",
+                    "example": "42"
                 },
                 "started_at": {
                     "type": "string",
@@ -493,6 +836,21 @@ const docTemplate = `{
                 "total_success": {
                     "type": "integer",
                     "example": 1250
+                }
+            }
+        },
+        "web.Response-any": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -556,6 +914,26 @@ const docTemplate = `{
                 }
             }
         },
+        "web.Response-array_web_MappingOpdResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.MappingOpdResponse"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "web.Response-web_HealthcheckResponse": {
             "type": "object",
             "properties": {
@@ -564,6 +942,23 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/web.HealthcheckResponse"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.Response-web_MappingOpdResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/web.MappingOpdResponse"
                 },
                 "message": {
                     "type": "string"
@@ -586,6 +981,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.UpdateMappingOpdRequest": {
+            "type": "object",
+            "properties": {
+                "kode_master": {
+                    "type": "string"
+                },
+                "kode_sumber": {
+                    "type": "string"
+                },
+                "sumber": {
                     "type": "string"
                 }
             }

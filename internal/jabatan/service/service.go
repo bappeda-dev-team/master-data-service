@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"log/slog"
+	"sort"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,31 +15,33 @@ import (
 	"master-data-service/internal/jabatan/repository"
 	masterSyncDomain "master-data-service/internal/master_sync/domain"
 	masterSyncWeb "master-data-service/internal/master_sync/web"
+	opdRepository "master-data-service/internal/opd/repository"
 
 	// "master-data-service/internal/opd/service/sync"
 	"master-data-service/internal/jabatan/web"
 )
 
 type MasterDataJabatanService struct {
-	Repo        *repository.MasterDataJabatanRepository
-	SyncService SnapshotService
-	Client      *client.SimpegClient
-	// SyncExecutor *sync.Registry
-	Logger *slog.Logger
+	Repo                 *repository.MasterDataJabatanRepository
+	SyncService          SnapshotService
+	Client               *client.SimpegClient
+	MappingOpdRepository *opdRepository.MappingOpdRepository
+	Logger               *slog.Logger
 }
 
 func NewMasterDataJabatanService(
 	repo *repository.MasterDataJabatanRepository,
 	syncService SnapshotService,
 	simpegClient *client.SimpegClient,
-	// syncExecutor *sync.Registry,
+	mappingOpdRepository *opdRepository.MappingOpdRepository,
 	// logger taruh paling bawah
 	logger *slog.Logger,
 ) *MasterDataJabatanService {
 	return &MasterDataJabatanService{
-		Repo:        repo,
-		SyncService: syncService,
-		Client:      simpegClient,
+		Repo:                 repo,
+		SyncService:          syncService,
+		Client:               simpegClient,
+		MappingOpdRepository: mappingOpdRepository,
 		// SyncExecutor:  syncExecutor,
 		Logger: logger,
 	}
@@ -46,11 +49,23 @@ func NewMasterDataJabatanService(
 
 func (s *MasterDataJabatanService) SyncDataJabatan(
 	ctx context.Context,
-	kodeOpd string,
+	req masterSyncWeb.MasterSyncRequest,
 ) (masterSyncWeb.MasterSyncResponse, error) {
 	s.Logger.Info("SyncDataJabatan")
 
+	// TODO: get from request
 	const syncFrom = "SIMPEG"
+	// mapping ke kode opd simpeg
+	mapping, err := s.MappingOpdRepository.FindBySumberAndKodeSumber(
+		ctx,
+		"EKAK",
+		req.KodeOpd,
+	)
+	if err != nil {
+		return masterSyncWeb.MasterSyncResponse{}, err
+	}
+
+	kodeOpd := mapping.KodeMaster
 
 	// CREATE SYNC RECORD
 	syncID := uuid.New().String()
@@ -137,10 +152,21 @@ func (s *MasterDataJabatanService) finishSync(
 
 func (s *MasterDataJabatanService) FindAllJabatanByKodeOpd(
 	ctx context.Context,
-	kodeOpd string,
+	kodeOpdSumber string,
 ) ([]web.DataMasterJabatanResponse, error) {
 	const op = "jabatan-service-FindAllJabatanByKodeOpd"
+	// TODO: get from request
 	const syncFrom = "SIMPEG"
+	mapping, err := s.MappingOpdRepository.FindBySumberAndKodeSumber(
+		ctx,
+		"EKAK",
+		kodeOpdSumber,
+	)
+	if err != nil {
+		return []web.DataMasterJabatanResponse{}, err
+	}
+
+	kodeOpd := mapping.KodeMaster
 
 	s.Logger.Info(
 		"find all jabatan by kode opd",
@@ -215,11 +241,17 @@ func (s *MasterDataJabatanService) FindAllJabatanByKodeOpd(
 				JenisJabatanNama:   jabatan.JenisJabatanNama,
 				JabatanKode:        jabatan.JabatanKode,
 				JabatanNama:        jabatan.JabatanNama,
-				JenjangJabatanKode: jabatan.JenjangJabatanKode,
 				JenjangJabatanNama: jabatan.JenjangJabatanNama,
 			},
 		)
 	}
+	sort.SliceStable(response, func(i, j int) bool {
+		if response[i].JenisJabatanKode != response[j].JenisJabatanKode {
+			return response[i].JenisJabatanKode < response[j].JenisJabatanKode
+		}
+
+		return response[i].JabatanKode < response[j].JabatanKode
+	})
 
 	s.Logger.Debug(
 		"successfully found jabatan",

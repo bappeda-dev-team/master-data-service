@@ -11,6 +11,5 @@ type DataMasterJabatanResponse struct {
 	JabatanKode string `json:"jabatan_kode"`
 	JabatanNama string `json:"jabatan_nama"`
 
-	JenjangJabatanKode *string `json:"jenjang_jabatan_kode,omitempty"`
 	JenjangJabatanNama *string `json:"jenjang_jabatan_nama,omitempty"`
 }
