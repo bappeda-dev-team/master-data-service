@@ -146,22 +146,26 @@ func (repo *MasterDataOpdRepository) FindAllOpdBySnapshotId(
 
 	const query = `
 		SELECT
-			id,
-			opd_kode,
-			opd_level,
-			opd_nama,
-			opd_jabatan,
-			eselon_kode,
-			eselon_nama,
-			sync_id,
-			sync_from,
-			sync_at,
-			created_at,
-			updated_at
-		FROM data_master_opd
-		WHERE sync_id = $1
-		AND opd_level = 1
-		ORDER BY opd_kode
+			opd.id,
+			opd.opd_kode,
+			opd.opd_level,
+			opd.opd_nama,
+			opd.opd_jabatan,
+			opd.eselon_kode,
+			opd.eselon_nama,
+			opd.sync_id,
+			opd.sync_from,
+			opd.sync_at,
+			opd.created_at,
+			opd.updated_at,
+			map.kode_sumber
+		FROM data_master_opd opd
+		LEFT JOIN mapping_opd map
+ 		    ON map.kode_master = opd.opd_kode
+		    AND map.sumber = 'EKAK'
+		WHERE opd.sync_id = $1
+		AND opd.opd_level = 1
+		ORDER BY opd.opd_kode
 	`
 
 	rows, err := repo.DB.QueryContext(ctx, query, snapshotId)
@@ -194,6 +198,7 @@ func (repo *MasterDataOpdRepository) FindAllOpdBySnapshotId(
 			&opd.SyncAt,
 			&opd.CreatedAt,
 			&opd.UpdatedAt,
+			&opd.KodeNomenklatur,
 		)
 		if err != nil {
 			repo.Logger.Error(

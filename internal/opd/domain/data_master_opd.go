@@ -17,4 +17,6 @@ type DataMasterOpd struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+
+	KodeNomenklatur *string
 }

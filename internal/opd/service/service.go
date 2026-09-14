@@ -184,10 +184,11 @@ func (s *DataMasterOpdService) FindAllOpd(
 	for _, opd := range masterOpd {
 		response = append(response,
 			web.DataMasterOpdResponse{
-				ID:       opd.ID,
-				OpdKode:  opd.OpdKode,
-				OpdLevel: opd.OpdLevel,
-				OpdNama:  opd.OpdNama,
+				ID:              opd.ID,
+				OpdKode:         opd.OpdKode,
+				OpdLevel:        opd.OpdLevel,
+				OpdNama:         opd.OpdNama,
+				KodeNomenklatur: opd.KodeNomenklatur,
 			},
 		)
 	}
