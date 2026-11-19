@@ -92,6 +92,51 @@ func (app *Application) FindMappingOpdByKodeSumber(
 	}
 }
 
+// FindMappingOpdByKodeMaster godoc
+// @Summary Get mapping opd by kode master
+// @Description Get mapping opd by kode master
+// @Tags mapping-opd
+// @Produce json
+// @Param kode_master query string true "Kode OPD master"
+// @Success 200 {object} web.Response[opdWeb.MappingOpdResponse]
+// @Failure 404 {object} web.ErrorResponse
+// @Failure 500 {object} web.ErrorResponse
+// @Router /mapping-opd/find-by-kode-master [get]
+func (app *Application) FindMappingOpdByKodeMaster(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	q := r.URL.Query()
+
+	kodeMaster := q.Get("kode_master")
+
+	mapping, err := app.MappingOpd.FindByKodeMaster(
+		r.Context(),
+		kodeMaster,
+	)
+	if err != nil {
+		if errors.Is(err, mappingOpdService.ErrMappingOpdNotFound) {
+			app.NotFoundResponse(w, r)
+			return
+		}
+
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	data := web.Response[*opdWeb.MappingOpdResponse]{
+		Code:    http.StatusOK,
+		Status:  http.StatusText(http.StatusOK),
+		Message: "DATA MAPPING OPD",
+		Data:    mapping,
+	}
+
+	if err := app.WriteJSON(w, http.StatusOK, data, nil); err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+}
+
 // FindMappingOpdByID godoc
 // @Summary Get mapping opd by ID
 // @Description Get mapping opd by ID

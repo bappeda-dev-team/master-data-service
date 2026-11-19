@@ -142,7 +142,6 @@ func (repo *MappingOpdRepository) FindBySumberAndKodeSumber(
 
 func (repo *MappingOpdRepository) FindBySumberAndKodeMaster(
 	ctx context.Context,
-	sumber string,
 	kodeMaster string,
 ) (*domain.MappingOpd, error) {
 	const query = `
@@ -154,8 +153,7 @@ func (repo *MappingOpdRepository) FindBySumberAndKodeMaster(
 			created_at,
 			updated_at
 		FROM mapping_opd
-		WHERE sumber = $1
-		  AND kode_master = $2
+		WHERE kode_master = $1
 	`
 
 	var mapping domain.MappingOpd
@@ -163,7 +161,6 @@ func (repo *MappingOpdRepository) FindBySumberAndKodeMaster(
 	err := repo.DB.QueryRowContext(
 		ctx,
 		query,
-		sumber,
 		kodeMaster,
 	).Scan(
 		&mapping.ID,

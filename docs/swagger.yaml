@@ -43,8 +43,6 @@ definitions:
         type: string
       jenis_jabatan_nama:
         type: string
-      jenjang_jabatan_kode:
-        type: string
       jenjang_jabatan_nama:
         type: string
       opd_kode:
@@ -58,6 +56,8 @@ definitions:
         type: string
       id:
         type: integer
+      kode_nomenklatur:
+        type: string
       opd_jabatan:
         type: string
       opd_kode:
@@ -71,49 +71,17 @@ definitions:
     properties:
       id:
         type: integer
-      opd_kode:
-        type: string
-      opd_level:
-        type: integer
       opd_nama:
-        type: string
-      pegawai_aktif_id:
-        type: string
-      pegawai_eselon_kode:
-        type: string
-      pegawai_eselon_nama:
-        type: string
-      pegawai_golongan_kode:
-        type: string
-      pegawai_golongan_nama:
-        type: string
-      pegawai_golongan_pangkat:
-        type: string
-      pegawai_golongan_tmt:
         type: string
       pegawai_jabatan_kode:
         type: string
       pegawai_jabatan_terakhir:
         type: string
-      pegawai_jenis:
-        type: string
       pegawai_jenis_jabatan_kode:
-        type: string
-      pegawai_jenis_jabatan_nama:
-        type: string
-      pegawai_jenis_kelamin:
-        type: string
-      pegawai_lahir_tanggal:
-        type: string
-      pegawai_lahir_tempat:
         type: string
       pegawai_nama:
         type: string
       pegawai_nip:
-        type: string
-      pegawai_pensiun_tmt:
-        type: string
-      pegawai_status:
         type: string
     type: object
   web.ErrorResponse:
@@ -441,6 +409,33 @@ paths:
           schema:
             $ref: '#/definitions/web.ErrorResponse'
       summary: Delete mapping opd
+      tags:
+      - mapping-opd
+  /mapping-opd/find-by-kode-master:
+    get:
+      description: Get mapping opd by kode master
+      parameters:
+      - description: Kode OPD master
+        in: query
+        name: kode_master
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response-web_MappingOpdResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get mapping opd by kode master
       tags:
       - mapping-opd
   /mapping-opd/find-by-kode-sumber:

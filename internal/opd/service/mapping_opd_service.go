@@ -59,14 +59,15 @@ func (s *MappingOpdService) Create(
 		return nil, err
 	}
 
-	existing, err = s.Repo.FindBySumberAndKodeMaster(
-		ctx,
-		mapping.Sumber,
-		mapping.KodeMaster,
-	)
-	if err == nil && existing != nil {
-		return nil, ErrMappingOpdExists
-	}
+	// IDK WHAT IS THIS
+	// existing, err = s.Repo.FindBySumberAndKodeMaster(
+	// 	ctx,
+	// 	mapping.Sumber,
+	// 	mapping.KodeMaster,
+	// )
+	// if err == nil && existing != nil {
+	// 	return nil, ErrMappingOpdExists
+	// }
 
 	if err != nil && !errors.Is(err, repository.ErrNotFound) {
 		return nil, err
@@ -125,17 +126,14 @@ func (s *MappingOpdService) FindBySumberAndKodeSumber(
 	return &response, nil
 }
 
-func (s *MappingOpdService) FindBySumberAndKodeMaster(
+func (s *MappingOpdService) FindByKodeMaster(
 	ctx context.Context,
-	sumber string,
 	kodeMaster string,
 ) (*opdWeb.MappingOpdResponse, error) {
-	sumber = strings.ToUpper(strings.TrimSpace(sumber))
 	kodeMaster = strings.TrimSpace(kodeMaster)
 
 	mapping, err := s.Repo.FindBySumberAndKodeMaster(
 		ctx,
-		sumber,
 		kodeMaster,
 	)
 	if err != nil {
@@ -214,23 +212,24 @@ func (s *MappingOpdService) Update(
 		}
 	}
 
-	if existing.Sumber != mapping.Sumber ||
-		existing.KodeMaster != mapping.KodeMaster {
+	// IDK WHAT IS THIS
+	// if existing.Sumber != mapping.Sumber ||
+	// 	existing.KodeMaster != mapping.KodeMaster {
 
-		found, err := s.Repo.FindBySumberAndKodeMaster(
-			ctx,
-			mapping.Sumber,
-			mapping.KodeMaster,
-		)
+	// 	found, err := s.Repo.FindBySumberAndKodeMaster(
+	// 		ctx,
+	// 		mapping.Sumber,
+	// 		mapping.KodeMaster,
+	// 	)
 
-		if err == nil && found != nil && found.ID != mapping.ID {
-			return nil, ErrMappingOpdExists
-		}
+	// 	if err == nil && found != nil && found.ID != mapping.ID {
+	// 		return nil, ErrMappingOpdExists
+	// 	}
 
-		if err != nil && !errors.Is(err, repository.ErrNotFound) {
-			return nil, err
-		}
-	}
+	// 	if err != nil && !errors.Is(err, repository.ErrNotFound) {
+	// 		return nil, err
+	// 	}
+	// }
 
 	if err := s.Repo.Update(ctx, mapping); err != nil {
 		return nil, err

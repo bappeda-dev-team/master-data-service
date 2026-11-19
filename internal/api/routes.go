@@ -31,6 +31,7 @@ func (app *Application) Routes() http.Handler {
 	// mapping opd
 	router.HandlerFunc(http.MethodGet, "/mapping-opd/findall", app.FindAllMappingOpd)
 	router.HandlerFunc(http.MethodGet, "/mapping-opd/find-by-kode-sumber", app.FindMappingOpdByKodeSumber)
+	router.HandlerFunc(http.MethodGet, "/mapping-opd/find-by-kode-master", app.FindMappingOpdByKodeMaster)
 	router.HandlerFunc(http.MethodPost, "/mapping-opd/create", app.CreateMappingOpd)
 	router.GET("/mapping-opd/find/:id", app.FindMappingOpdByID)
 	router.PUT("/mapping-opd/update/:id", app.UpdateMappingOpd)

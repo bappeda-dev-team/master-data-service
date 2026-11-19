@@ -227,6 +227,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/mapping-opd/find-by-kode-master": {
+            "get": {
+                "description": "Get mapping opd by kode master",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mapping-opd"
+                ],
+                "summary": "Get mapping opd by kode master",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD master",
+                        "name": "kode_master",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_MappingOpdResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/mapping-opd/find-by-kode-sumber": {
             "get": {
                 "description": "Get mapping opd by kode sumber",
@@ -611,9 +652,6 @@ const docTemplate = `{
                 "jenis_jabatan_nama": {
                     "type": "string"
                 },
-                "jenjang_jabatan_kode": {
-                    "type": "string"
-                },
                 "jenjang_jabatan_nama": {
                     "type": "string"
                 },
@@ -633,6 +671,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "kode_nomenklatur": {
+                    "type": "string"
                 },
                 "opd_jabatan": {
                     "type": "string"
@@ -654,34 +695,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "opd_kode": {
-                    "type": "string"
-                },
-                "opd_level": {
-                    "type": "integer"
-                },
                 "opd_nama": {
-                    "type": "string"
-                },
-                "pegawai_aktif_id": {
-                    "type": "string"
-                },
-                "pegawai_eselon_kode": {
-                    "type": "string"
-                },
-                "pegawai_eselon_nama": {
-                    "type": "string"
-                },
-                "pegawai_golongan_kode": {
-                    "type": "string"
-                },
-                "pegawai_golongan_nama": {
-                    "type": "string"
-                },
-                "pegawai_golongan_pangkat": {
-                    "type": "string"
-                },
-                "pegawai_golongan_tmt": {
                     "type": "string"
                 },
                 "pegawai_jabatan_kode": {
@@ -690,34 +704,13 @@ const docTemplate = `{
                 "pegawai_jabatan_terakhir": {
                     "type": "string"
                 },
-                "pegawai_jenis": {
-                    "type": "string"
-                },
                 "pegawai_jenis_jabatan_kode": {
-                    "type": "string"
-                },
-                "pegawai_jenis_jabatan_nama": {
-                    "type": "string"
-                },
-                "pegawai_jenis_kelamin": {
-                    "type": "string"
-                },
-                "pegawai_lahir_tanggal": {
-                    "type": "string"
-                },
-                "pegawai_lahir_tempat": {
                     "type": "string"
                 },
                 "pegawai_nama": {
                     "type": "string"
                 },
                 "pegawai_nip": {
-                    "type": "string"
-                },
-                "pegawai_pensiun_tmt": {
-                    "type": "string"
-                },
-                "pegawai_status": {
                     "type": "string"
                 }
             }
